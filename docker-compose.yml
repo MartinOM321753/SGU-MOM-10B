@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  sgu-database:
+    image: mysql:8
+    container_name: sgu-database
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sgu
+    ports:
+      - "3306:3306"
+    volumes:
+      - sgu-volume:/var/lib/mysql
+    networks:
+      - sgu-net
+    restart: unless-stopped
+
+  sgu-backend:
+    build:
+      context: ./server
+    image: server:1.0-sgu
+    container_name: sgu-backend
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: sgu-database
+      DB_PORT: 3306
+      DB_NAME: sgu
+      DB_USER: root
+      DB_PASS: root
+    ports:
+      - "8080:8080"
+    networks:
+      - sgu-net
+    restart: unless-stopped
+    depends_on:
+      - sgu-database
+
+  sgu-frontend:
+    build:
+      context: ./client
+      args:
+        API_HOST: localhost
+        API_PORT: 8080
+        API_BASE: /api
+ 
+    image: client:1.0-sgu
+    container_name: sgu-frontend
+    ports:
+      - "3000:80" 
+    networks:
+      - sgu-net
+    restart: unless-stopped
+    depends_on:
+      - sgu-backend
+
+volumes:
+  sgu-volume:
+
+networks:
+  sgu-net:
+    driver: bridge

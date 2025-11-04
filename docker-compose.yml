@@ -21,14 +21,14 @@ services:
     image: server:1.0-sgu
     container_name: sgu-backend
     environment:
-      SERVER_PORT: 8080
+      SERVER_PORT: 8081
       DB_HOST: sgu-database
       DB_PORT: 3306
       DB_NAME: sgu
       DB_USER: root
       DB_PASS: root
     ports:
-      - "8080:8080"
+      - "8081:8080"
     networks:
       - sgu-net
     restart: unless-stopped
